@@ -4,6 +4,7 @@
 schemaVersion: 1.2
 endpoints:
   - name: maternal-health-chatbot-api
+    type: REST
     displayName: Maternal Health Chatbot API
     service:
       basePath: /
