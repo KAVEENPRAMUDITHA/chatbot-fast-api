@@ -17,6 +17,7 @@ sentence-transformers
 # --- Document Loading ---
 pypdf
 
-# --- Core ML (required by sentence-transformers) ---
+# --- CPU-only PyTorch (avoids 2GB+ CUDA packages that cause disk space errors on Choreo) ---
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
 transformers
