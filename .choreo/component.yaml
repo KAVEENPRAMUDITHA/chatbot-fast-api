@@ -1,0 +1,13 @@
+# Choreo Component Configuration
+# https://wso2.com/choreo/docs/
+
+schemaVersion: 1.2
+endpoints:
+  - name: maternal-health-chatbot-api
+    displayName: Maternal Health Chatbot API
+    service:
+      basePath: /
+      port: 8000
+      type: REST
+    networkVisibility: Public
+    schemaFilePath: openapi.yaml

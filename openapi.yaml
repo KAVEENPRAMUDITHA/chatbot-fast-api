@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: Maternal & Newborn Health Chatbot API
+  description: >
+    AI-powered chatbot for maternal and newborn health queries in Sri Lanka.
+    Uses RAG (Retrieval-Augmented Generation) with FAISS vector store and Google Gemini.
+  version: "1.0.0"
+  contact:
+    name: Chatbot Support
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Returns the health status of the service and knowledge base.
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  knowledge_base_loaded:
+                    type: boolean
+                    example: true
+
+  /chat:
+    post:
+      summary: Chat with the Maternal Health Bot
+      description: >
+        Send a question (and optional image) to the maternal health chatbot.
+        The chatbot retrieves relevant context from the knowledge base and
+        generates an answer using Google Gemini.
+      operationId: chat
+      tags:
+        - Chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: Successful response with generated answer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+        "422":
+          description: Validation error
+        "500":
+          description: Internal server error
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          description: The user's question text
+          example: "මාතෘ සෞඛ්‍ය යනු කුමක්ද?"
+        image:
+          type: string
+          nullable: true
+          description: Optional Base64 encoded image string (JPEG/PNG)
+
+    ChatResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: Generated answer from the chatbot
+        error:
+          type: string
+          nullable: true
+          description: Error message if something went wrong
