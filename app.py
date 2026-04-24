@@ -17,8 +17,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 load_dotenv()
 
-# --- Knowledge Base Settings (unchanged) ---
+# --- Global singletons (initialized once at startup) ---
 vectorstore = None
+llm = None
 DB_FAISS_PATH = 'vectorstore/db_faiss'
 
 
@@ -78,8 +79,11 @@ def initialize_knowledge_base():
 # --- FastAPI Lifespan (replaces Flask's module-level init) ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize knowledge base on startup."""
+    """Initialize knowledge base and LLM once on startup."""
+    global llm
     initialize_knowledge_base()
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.3)
+    print("LLM initialized.")
     yield
 
 
@@ -146,8 +150,7 @@ async def chat(request: ChatRequest):
     user_question = request.question
     image_base64 = request.image
 
-    # LLM for generating answers (unchanged)
-    llm = ChatGoogleGenerativeAI(model="gemini-flash-latest", temperature=0.3)
+    # LLM already initialized at startup — use global instance
 
     system_instruction = (
         "ඔබ ශ්‍රී ලංකාවේ මාතෘ සහ ළදරු සෞඛ්‍ය පිළිබඳ සහායක AI නිලධාරියෙකි. "
@@ -202,4 +205,4 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=False)
